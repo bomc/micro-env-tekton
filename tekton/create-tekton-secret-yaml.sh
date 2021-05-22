@@ -9,7 +9,7 @@ export ENV_PRIV_KEY="$(cat tekton-ssh-key | base64 -w 0)"
 echo $ENV_PRIV_KEY
 
 echo "--- Create secret as kubernetes resource."
-cat > tekton-git-ssh-secret.yaml << EOM
+cat > 010-tekton-git-ssh-secret << EOM
 apiVersion: v1
 kind: Secret
 metadata:
