@@ -1,3 +1,4 @@
+# Setup for using tekton with argocd
 
 A private Git repository on GitHub can be accessed using either SSH or HTTPS. The preferred method is to always use SSH and a SSH key pair. Only use HTTPS if you have no choice.
 ## Access private repository on GitHub
