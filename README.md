@@ -6,7 +6,7 @@ A private Git repository on GitHub can be accessed using either SSH or HTTPS. Th
 ```
 $ ssh-keygen -t rsa -b 4096 -C "tekton@tekton.dev" -f tekton-ssh-key -N tekton
 Generating public/private rsa key pair.
-Your identification has been saved in tekton-ssh-keym
+Your identification has been saved in tekton-ssh-key
 Your public key has been saved in tekton-ssh-keym.pub
 The key fingerprint is:
 SHA256:VxENc52OCS9L+R+gIQ1rQBRSL5P4da3+OiZNPlCft8Q tekton@tekton.dev
@@ -54,8 +54,8 @@ Where `ENV_PRIV_KEY` is the private key. The seceret lives in the `tekton-pipeli
 
 Or run the bash file `create-tekton-secret-yaml.sh` that do the stuff in one step.
 
-Enter the public key from `tekton-ssh-key.pub` in github.com.
+### Register the public key from `tekton-ssh-key.pub` in github.com.
 
 Go to the github website and select the repository to access. 
-From the menu bar, select `Settings` and then `Deploy keys`. 
+From the menu bar, select `Settings` and then `Deploy keys` in the middle. 
 Insert the content from the public key `tekton-ssh-key.pub` to the field and set `Allow write access`.
