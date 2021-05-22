@@ -1,0 +1,19 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: consumer-jib-gradle
+  #namespace: tekton-pipelines
+spec:
+  taskRef:
+    name: jib-gradle
+  params:
+  - name: IMAGE
+    value: localhost:5000/bomc/test
+  - name: DIRECTORY
+    value: .
+  - name: INSECUREREGISTRY
+    value: "true"
+  workspaces:
+  - name: source
+    persistentVolumeClaim:
+      claimName: tekton-workspace-pvc

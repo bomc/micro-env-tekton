@@ -1,0 +1,13 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: argocd-task-sync-and-wait-run
+spec:
+  taskRef:
+    name: argocd-task-sync-and-wait
+  params:
+  - name: application-name
+    value: bomc-ms-argocd-consumer-apps
+  - name: flags
+    value: --insecure --plaintext --grpc-web-root-path "argocd" # needed in this example only because the Argo CD server is locally hosted
+

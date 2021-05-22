@@ -1,0 +1,13 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: curl-registry-run
+spec:
+  params:
+    - name: url
+      value: "http://registry.kube-system.svc.cluster.local:80/v2/"
+    - name: options
+      value:
+       - "-v"
+  taskRef:
+    name: curl

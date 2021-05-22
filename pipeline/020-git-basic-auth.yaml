@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: git-basic-app-consumer
+  namespace: tekton-pipelines
+  annotations:
+    tekton.dev/git-0: https://github.com/bomc/micro-env-consumer-app
+type: kubernetes.io/basic-auth
+stringData:
+  username: bomc
+  password: bomc$1234

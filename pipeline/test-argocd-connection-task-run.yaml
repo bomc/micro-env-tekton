@@ -1,0 +1,14 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: deploy-consumer
+spec:
+  taskRef:
+    name: deploy
+  params:
+  - name: ARGO_APP_NAME
+    value: bomc-ms-argocd-consumer-apps
+  workspaces:
+  - name: config-source
+    emptyDir: {}
+---

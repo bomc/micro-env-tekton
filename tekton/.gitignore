@@ -1,0 +1,3 @@
+# Ignore keys
+tekton-ssh-key
+tekton-ssh-key.pub

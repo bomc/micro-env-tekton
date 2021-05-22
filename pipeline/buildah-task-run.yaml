@@ -1,0 +1,16 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: buildah-build-consumer
+spec:
+  taskRef:
+    name: buildah
+  params:
+  - name: IMAGE
+    value: registry.kube-system.svc.cluster.local:80/bomc/consumer
+  - name: TLSVERIFY
+    value: "false"
+  workspaces:
+  - name: source
+    persistentVolumeClaim:
+      claimName: tekton-workspace-pvc

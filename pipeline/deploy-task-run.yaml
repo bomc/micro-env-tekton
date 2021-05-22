@@ -1,0 +1,20 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: deploy-consumer
+spec:
+  taskRef:
+    name: deploy
+  serviceAccountName: git-secret
+  params:
+  - name: CONFIG_GIT_URL
+    value: https://github.com/bomc/micro-env-consumer-app.git
+  - name: NEW_TAG
+    value: latest
+  - name: ARGO_APP_NAME
+    value: bomc-consumer-prod
+  workspaces:
+  - name: config-source
+    persistentVolumeClaim:
+      claimName: tekton-workspace-pvc
+---
