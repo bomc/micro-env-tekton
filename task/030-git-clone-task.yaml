@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: git-clone
-  #namespace: tekton-pipelines
+  namespace: bomc-tekton-pipelines
   labels:
     app.kubernetes.io/version: "0.3"
   annotations:
@@ -14,14 +14,14 @@ spec:
     These Tasks are Git tasks to work with repositories used by other tasks
     in your Pipeline.
     The git-clone Task will clone a repo from the provided url into the
-    output Workspace. By default the repo will be cloned into the root of
+    source Workspace. By default the repo will be cloned into the root of
     your Workspace. You can clone into a subdirectory by setting this Task's
     subdirectory param. This Task also supports sparse checkouts. To perform
     a sparse checkout, pass a list of comma separated directory patterns to
     this Task's sparseCheckoutDirectories param.
 
   workspaces:
-    - name: output
+    - name: source
       description: The git repo will be cloned onto the volume backing this workspace
   params:
     - name: url
@@ -47,7 +47,7 @@ spec:
       type: string
       default: "true"
     - name: subdirectory
-      description: subdirectory inside the "output" workspace to clone the git repo into
+      description: subdirectory inside the "source" workspace to clone the git repo into
       type: string
       default: ""
     - name: sparseCheckoutDirectories
@@ -114,7 +114,7 @@ spec:
       - name: PARAM_SPARSE_CHECKOUT_DIRECTORIES
         value: $(params.sparseCheckoutDirectories)
       - name: WORKSPACE_OUTPUT_PATH
-        value: $(workspaces.output.path)
+        value: $(workspaces.source.path)
       script: |
         #!/bin/sh
         set -eu -o pipefail
@@ -173,6 +173,6 @@ spec:
         #!/bin/sh
         set -eu -o pipefail
         
-        cd $(workspaces.output.path)
+        cd $(workspaces.source.path)
         echo "$(pwd)"
         echo "$(ls -alR)"

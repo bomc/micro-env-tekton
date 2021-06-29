@@ -1,0 +1,14 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: curl-check-registry-repository-run
+  namespace: bomc-tekton-pipelines
+spec:
+  params:
+    - name: curl-url
+      value: "http://registry.kube-system.svc.cluster.local:80/v2/_catalog"
+    - name: curl-options
+      value:
+       - "-v"
+  taskRef:
+    name: curl

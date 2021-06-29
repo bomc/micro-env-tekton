@@ -2,6 +2,7 @@ apiVersion: tekton.dev/v1beta1
 kind: TaskRun
 metadata:
   name: buildah-build-consumer
+  namespace: bomc-tekton-pipelines
 spec:
   taskRef:
     name: buildah

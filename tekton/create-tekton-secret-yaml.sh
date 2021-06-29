@@ -2,14 +2,14 @@
 echo "--- Create tekton secret yaml"
 
 # Create private and public key without passphrase.
-ssh-keygen -t rsa -b 4096 -C "tekton@tekton.dev" -f tekton-ssh-key -N ""
+ssh-keygen -t rsa -b 4096 -C "michael_boerner@t-online.de" -f tekton-ssh-key -N ""
 
 echo "--- Extract private code base64 encoded."
 export ENV_PRIV_KEY="$(cat tekton-ssh-key | base64 -w 0)"
 echo $ENV_PRIV_KEY
 
 echo "--- Create secret as kubernetes resource."
-cat > 010-tekton-git-ssh-secret << EOM
+cat > 010-tekton-git-ssh-secret.yaml << EOM
 apiVersion: v1
 kind: Secret
 metadata:

@@ -2,6 +2,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: curl
+  namespace: bomc-tekton-pipelines
   labels:
     app.kubernetes.io/version: "0.1"
   annotations:
@@ -9,13 +10,13 @@ metadata:
     tekton.dev/tags: search
 spec:
   description: >-
-    This task performs curl operation to transfer data from internet.
+    This task performs curl operations.
 
   params:
-  - name: url
+  - name: curl-url
     description: URL to curl'ed
     type: string
-  - name: options
+  - name: curl-options
     description: options of url
     type: array
     default: []
@@ -27,4 +28,4 @@ spec:
   - name: curl
     image: "$(params.curl-image)"
     command: [curl]
-    args: ["$(params.options[*])", "$(params.url)"]
+    args: ["$(params.curl-options[*])", "$(params.curl-url)"]

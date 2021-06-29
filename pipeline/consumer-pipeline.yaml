@@ -1,0 +1,115 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: consumer-build-deploy
+  namespace: bomc-tekton-pipelines
+spec:
+  params:
+
+    - name: url
+      description: git url to clone
+    - name: revision
+      description: git revision to checkout (branch, tag, sha, ref…)
+    - name: sslVerify
+      description: defines if http.sslVerify should be set to true or false in the global git config
+
+    - name: IMAGE
+      description: Reference of the image buildah will produce.
+    - name: TLSVERIFY
+      description: Verify the TLS on the registry endpoint (for push/pull to a non-TLS registry)
+
+    - name: curl-url-registry-tag-list
+      description: URL to curl'ed the tag list of the docker registry.
+    - name: curl-url-registry-catalog
+      description: URL to curl'ed the catalog of the docker registry.
+    - name: curl-options
+      type: array
+      description: options of url
+
+    - name: CONFIG_GIT_URL
+      description: The git url of the config app.
+    - name: NEW_TAG
+      description: The new tag of the image.
+    - name: ARGO_APP_NAME
+      description: The name to indentify in argocd.
+    - name: ENVIRONMENT
+      description: The environment to deploy.
+
+  workspaces:
+    - name: source
+
+  tasks:
+    - name: git-clone-consumer-repo-task
+      taskRef:
+        name: git-clone
+      params:
+        - name: url
+          value: $(params.url)
+        - name: revision
+          value: $(params.revision)
+        - name: sslVerify
+          value: $(params.sslVerify)
+      workspaces:
+        - name: source
+          workspace: source
+
+    - name: build-push-java-app
+      taskRef:
+        name: buildah
+      runAfter:
+        - git-clone-consumer-repo-task
+      params:
+        - name: IMAGE
+          value: $(params.IMAGE):$(params.NEW_TAG)
+        - name: TLSVERIFY
+          value: $(params.TLSVERIFY)
+      workspaces:
+        - name: source
+          workspace: source
+
+    - name: check-registry-catalog
+      taskRef:
+        name: curl
+      runAfter:
+        - build-push-java-app
+      params:
+        - name: curl-url
+          value: $(params.curl-url-registry-catalog)
+        - name: curl-options
+          value:
+            - $(params.curl-options)
+
+    - name: check-registry-tag-list
+      taskRef:
+        name: curl
+      runAfter:
+        - check-registry-catalog
+      params:
+        - name: curl-url
+          value: $(params.curl-url-registry-tag-list)
+        - name: curl-options
+          value:
+            - $(params.curl-options)
+
+    - name: deploy-to-kubernetes
+      taskRef:
+        name: deploy
+      runAfter:
+        - check-registry-tag-list
+      params:
+        - name: CONFIG_GIT_URL
+          value: $(params.CONFIG_GIT_URL)
+        - name: NEW_TAG
+          value: $(params.NEW_TAG)
+        - name: ARGO_APP_NAME
+          value: $(params.ARGO_APP_NAME)
+        - name: ENVIRONMENT
+          value: $(params.ENVIRONMENT)
+        - name: IMAGE
+          value: $(params.IMAGE):$(params.NEW_TAG)
+          
+      workspaces:
+        - name: source
+          workspace: source
+
+---

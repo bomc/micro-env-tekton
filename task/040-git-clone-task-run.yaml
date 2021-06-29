@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1beta1
 kind: TaskRun
 metadata:
   name: git-clone
-  #namespace: tekton-pipelines
+  namespace: bomc-tekton-pipelines
 spec:
   taskRef:
     name: git-clone
@@ -14,6 +14,6 @@ spec:
     - name: sslVerify
       value: "false"
   workspaces:
-    - name: output
+    - name: source
       persistentVolumeClaim:
         claimName: tekton-workspace-pvc

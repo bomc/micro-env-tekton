@@ -1,0 +1,59 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: build-deploy-
+  namespace: bomc-tekton-pipelines
+spec:
+  pipelineRef:
+    name: build-deploy
+  serviceAccountName: pipeline
+  params:
+#  - name: buildRevision
+#    value: 'd9c7ccb0713da882d8373169e2a1d705f5959386'
+#  - name: appGitUrl
+#    value: 'git@github.com:example/app.git'
+#  - name: configGitUrl
+#    value: 'git@github.com:example/app-config.git'
+#  - name: appImage
+#    value: 'docker.example.com/app'
+#  workspaces:
+#  - name: app-source
+#    emptyDir: {}
+#  - name: config-source
+#    emptyDir: {}
+
+
+  - name: url
+    value: 'git@github.com:bomc/micro-env-consumer-app.git'
+  - name: revision
+    value: 'main'
+  - name: sslVerify
+    value: 'false'
+  - name: IMAGE
+    value: 'registry.kube-system.svc.cluster.local/bomc/consumer'
+  - name: TLSVERIFY
+    value: 'false'
+
+  - name: curl-url-registry-catalog
+    value: 'http://registry.kube-system.svc.cluster.local:80/v2/_catalog'
+  - name: curl-url-registry-tag-list
+    value: 'http://registry.kube-system.svc.cluster.local:80/v2/bomc/consumer/tags/list'
+  - name: curl-options
+    value:
+      - '-v'
+
+  - name: CONFIG_GIT_URL
+    value: 'git@github.com:bomc/micro-env-consumer-app.git'
+  - name: NEW_TAG
+    value: 'v0.0.6'
+  - name: ARGO_APP_NAME
+    value: 'bomc-ms-argocd-consumer-apps'
+  - name: ENVIRONMENT
+    value: 'prod'
+
+  workspaces:
+  - name: source
+    persistentVolumeClaim:
+      claimName: tekton-workspace-pvc
+
+    

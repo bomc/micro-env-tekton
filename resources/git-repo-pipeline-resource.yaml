@@ -1,0 +1,9 @@
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: consumer-git-repo
+spec:
+  type: git
+  params:
+    - name: consumer-git-url
+      value: https://github.com/bomc/micro-env-consumer-app.git

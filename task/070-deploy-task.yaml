@@ -1,0 +1,73 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: deploy
+  namespace: bomc-tekton-pipelines
+spec:
+  params:
+  - name: CONFIG_GIT_URL
+    default: ""
+  - name: NEW_TAG
+    default: latest
+  - name: ARGO_APP_NAME
+    default: ""
+  - name: ENVIRONMENT
+    default: "dev"
+  - name: IMAGE
+    default: ""
+  workspaces:
+  - name: source
+  stepTemplate:
+    envFrom:
+    - secretRef:
+        name: argocd-env-secret
+    env:
+    - name: ARGOCD_SERVER
+      value: argocd-server.argocd:80
+
+  steps:
+  - name: update-yaml
+    image: alpine/git:v2.26.2
+    workingDir: "$(workspaces.source.path)/deployment/overlays/$(params.ENVIRONMENT)"
+    script: |
+      #!/usr/bin/env sh
+      set -ex
+
+      git checkout main
+      
+      echo "Updating $(params.ENVIRONMENT) image to $(params.IMAGE):$(params.NEW_TAG)"
+      sed -i "s/newTag: "[a-zA-Z0-9.]\\+"/newTag: "$(params.NEW_TAG)"/g" kustomization.yaml
+
+      cat kustomization.yaml
+  - name: commit-push-changes-gitops
+    image: alpine/git:v2.26.2
+    workingDir: "$(workspaces.source.path)/deployment/overlays/$(params.ENVIRONMENT)"
+    script: |
+      #!/usr/bin/env sh
+      set -ex
+
+      git config --global user.email "michael_boerner@t-online.de"
+      git config --global user.name "bomc"
+
+      git status
+
+      git add .
+      git commit --allow-empty -m "[tekton] updating $(params.ENVIRONMENT) image to $(params.NEW_TAG)"
+
+      eval $(ssh-agent)
+      ssh-add ~/.ssh/id_*
+
+      git push origin main
+
+  - name: wait-for-argocd-rollout
+    image: argoproj/argocd:v2.0.0
+    script: |
+      #!/usr/bin/env sh
+      set -e
+
+      printenv
+
+      argocd login ${ARGOCD_SERVER} --insecure --username admin --password bomc
+      argocd app sync $(inputs.params.ARGO_APP_NAME) --insecure
+      argocd app wait $(inputs.params.ARGO_APP_NAME) --sync --health --operation --insecure
+---

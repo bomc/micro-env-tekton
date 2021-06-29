@@ -1,0 +1,11 @@
+apiVersion: getambassador.io/v2
+kind: Mapping
+metadata:
+  name: ambassador-tekton-mapping
+  namespace: tekton-pipelines
+spec:
+  prefix: /tekton
+  rewrite: /tekton
+  service: tekton-dashboard.tekton-pipelines:80
+# kubectl apply -f 030-ambassador-mapping.yaml
+

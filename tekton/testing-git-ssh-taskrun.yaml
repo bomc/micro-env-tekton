@@ -13,24 +13,41 @@ spec:
     - name: app-source
 
     steps:
-    - name: git-checkout
+    - name: test-git-ssh
       image: alpine/git:v2.26.2
       workingDir: "$(workspaces.app-source.path)"
       script: |
         #!/usr/bin/env sh
         set -e
+        
         eval $(ssh-agent)
         ssh-add ~/.ssh/id_*
         
         git config --global core.sshCommand 'ssh -o StrictHostKeyChecking=accept-new'
+        
         git init
         git remote add origin $(params.appGitUrl)
         git fetch --depth 1 origin $(params.buildRevision)
         git checkout FETCH_HEAD
+        
+        ls -rla
+        
+        git config --global user.email "michael_boerner@t-online.de"
+        git config --global user.name "bomc"
+        
+        # Create a new file and push it to the repository.
+        touch initial
+        
+        git add initial
+        git commit -m "add initial"
+        
+        eval $(ssh-agent)
+        ssh-add ~/.ssh/id_*
+        git push origin HEAD:main
 
   params:
   - name: buildRevision
-    value: 'cc30d6f369d0172e9460673b6e20c7362274c8c5'
+    value: 'main'
   - name: appGitUrl
     value: 'git@github.com:bomc/micro-env-consumer-app.git'
   workspaces:
