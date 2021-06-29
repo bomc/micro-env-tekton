@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ./010-bomc-tekton-pipelines-namespace.yaml
+  - ./020-workspace-pvc.yaml
+  - ./030-git-clone-task.yaml
+  - ./050-buildah-task.yaml
+  - ./070-deploy-task.yaml
+  - ./090-curl-task.yaml
+
+commonLabels:
+  app.kubernetes.io/name: bomc-consumer-app
+
