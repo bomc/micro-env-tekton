@@ -1,3 +1,4 @@
 # Ignore keys
 tekton-ssh-key
 tekton-ssh-key.pub
+tekton_env_private_key.sh

@@ -32,7 +32,10 @@ On GitHub the repository SSH key is referred to by the term Deploy key. Search d
 
 Click on the Add deploy key button. In this section, give the key a name and paste in the contents of the public key file from the SSH key pair. This is the file with the .pub extension, which in this example is called tekton-ssh-key.pub.
 
-The next step is to create a secret in Minikube to hold the private key of the SSH key pair. 
+The next step is to create a secret in Minikube to hold the private key of the SSH key pair.
+
+NOTE: Before running the 'tekton-git-ssh-secret.yaml' set the ENV_PRIV_KEY variable. (tekton_env_private_key.sh holds the private key)
+
 Create the secret run:
 
 ```
