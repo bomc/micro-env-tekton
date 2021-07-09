@@ -1,11 +1,11 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  generateName: build-deploy-
+  generateName: consumer-build-deploy-
   namespace: bomc-tekton-pipelines
 spec:
   pipelineRef:
-    name: build-deploy
+    name: consumer-build-deploy
   serviceAccountName: pipeline
   params:
 #  - name: buildRevision
@@ -42,6 +42,13 @@ spec:
     value:
       - '-v'
 
+  - name: DOCKER_FILE
+    value: 'Dockerfile'
+  - name: DOCKER_FILE_PATH
+    value: '/source'
+  - name: PIPELINE_DEBUG
+    value: '1'
+
   - name: CONFIG_GIT_URL
     value: 'git@github.com:bomc/micro-env-consumer-app.git'
   - name: NEW_TAG
@@ -56,4 +63,3 @@ spec:
     persistentVolumeClaim:
       claimName: tekton-workspace-pvc
 
-    

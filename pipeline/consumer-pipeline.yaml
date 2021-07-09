@@ -13,6 +13,13 @@ spec:
     - name: sslVerify
       description: defines if http.sslVerify should be set to true or false in the global git config
 
+    - name: DOCKER_FILE
+      description: The name of the Dockerfile.
+    - name: DOCKER_FILE_PATH
+      description: The path to the Dockerfile that is used for the build (default to . meaning current directory)
+    - name: PIPELINE_DEBUG
+      description: Pipeline debug mode.
+    
     - name: IMAGE
       description: Reference of the image buildah will produce.
     - name: TLSVERIFY
@@ -53,11 +60,27 @@ spec:
         - name: source
           workspace: source
 
+    - name: linter-docker-lint
+      taskRef:
+        name: linter-docker-lint
+      runAfter:
+        - git-clone-consumer-repo-task
+      params:
+        - name: dockerfile
+          value: $(params.DOCKER_FILE)
+        - name: path-to-dockerfile
+          value: $(params.DOCKER_FILE_PATH)
+        - name: pipeline-debug
+          value: $(params.PIPELINE_DEBUG)
+      workspaces:
+        - name: source
+          workspace: source
+
     - name: build-push-java-app
       taskRef:
         name: buildah
       runAfter:
-        - git-clone-consumer-repo-task
+        - linter-docker-lint
       params:
         - name: IMAGE
           value: $(params.IMAGE):$(params.NEW_TAG)
@@ -67,11 +90,25 @@ spec:
         - name: source
           workspace: source
 
+    - name: scan-image
+      taskRef:
+        name: scan-image
+      runAfter:
+        - build-push-java-app
+      params:
+        - name: IMAGE
+          value: $(params.IMAGE)
+        - name: TAG
+          value: $(params.NEW_TAG)
+      workspaces:
+        - name: source
+          workspace: source
+
     - name: check-registry-catalog
       taskRef:
         name: curl
       runAfter:
-        - build-push-java-app
+        - scan-image
       params:
         - name: curl-url
           value: $(params.curl-url-registry-catalog)
