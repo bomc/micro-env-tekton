@@ -1,0 +1,17 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: image-scan-run
+  namespace: bomc-tekton-pipelines
+spec:
+  taskRef:
+    name: scan-image
+  params:
+  - name: IMAGE
+    value: registry.kube-system.svc.cluster.local:80/bomc/consumer
+  - name: TAG
+    value: 'v0.0.6'
+  workspaces:
+  - name: source
+    persistentVolumeClaim:
+      claimName: tekton-workspace-pvc
