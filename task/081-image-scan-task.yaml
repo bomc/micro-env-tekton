@@ -1,0 +1,51 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: scan-image
+  namespace: bomc-tekton-pipelines
+spec:
+  params:
+  - name: IMAGE
+    description: Reference of the image that will scan.
+  - name: TAG
+    description: Reference of the image buildah will produce.
+  volumes:
+#    - name: encryption-keys
+#      secret: 
+#        secretName: enc-key
+    - name: trivy-cache
+      hostPath:
+        # TODO Change this to a usable location on disk with some space (this works for certain versions of minikube since it is the mount point of the disk)
+        # Check the directory with: minikube ssh "df -h"
+        path: /mnt/sda1/trivy-cache 
+        type: DirectoryOrCreate
+  workspaces:
+    - name: source
+  steps:
+    - name: trivy-scan-image
+      image: aquasec/trivy:latest
+      script: |
+        set -e
+        
+        PATH_TO_IMAGE="$(params.IMAGE):$(params.TAG)"
+        echo -e "Trivy Security Scan image in registry"
+        
+        trivy image --clear-cache
+        
+        #trivy image --exit-code 0 ${PATH_TO_IMAGE}
+        trivy --cache-dir /root/.cache/trivy --skip-update --vuln-type='os,library' --format='table' --exit-code 0 image ${PATH_TO_IMAGE} > /tekton/home/cve-report_0.txt
+        cat /tekton/home/cve-report_0.txt
+        
+        #trivy image --exit-code 1 --severity CRITICAL ${PATH_TO_IMAGE}
+        trivy --cache-dir /root/.cache/trivy --skip-update --severity='HIGH,CRITICAL' --vuln-type='os,library' --format='table' --exit-code 1 image ${PATH_TO_IMAGE} > /tekton/home/cve-report_1.txt
+        cat /tekton/home/cve-report_1.txt
+        
+        my_exit_code=$?
+        
+        echo "Scan exit code :--- $my_exit_code"
+        if [ ${my_exit_code} == 1 ]; then
+          echo "Trivy scanning completed. CRITICAL Vulnerabilities found."
+          exit 1
+        else
+          echo "Trivy scanning completed. CRITICAL vulnerabilities not found."
+        fi
