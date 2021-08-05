@@ -10,7 +10,7 @@ spec:
   - name: IMAGE
     value: registry.kube-system.svc.cluster.local:80/bomc/consumer
   - name: TAG
-    value: 'v0.0.6'
+    value: 'latest'
   workspaces:
   - name: source
     persistentVolumeClaim:

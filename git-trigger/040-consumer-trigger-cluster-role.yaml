@@ -1,0 +1,14 @@
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: consumer-triggers-cluster-role
+  namespace: bomc-tekton-pipelines
+rules:
+  # EventListeners need to be able to fetch any clustertriggerbindings
+- apiGroups: ["triggers.tekton.dev"]
+  resources: ["clustertriggerbindings", "clusterinterceptors"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["clusterinterceptors.triggers.tekton.dev"]
+  resources: ["clustertriggerbindings", "clusterinterceptors"]
+  verbs: ["get", "list", "watch"]
+---

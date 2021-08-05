@@ -1,0 +1,11 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: consumer-event-listener-interceptor
+  namespace: bomc-tekton-pipelines
+spec:
+  serviceAccountName: consumer-triggers-sa
+  triggers:
+    - triggerRef: consumer-listener-prod
+
+    

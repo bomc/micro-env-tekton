@@ -1,0 +1,14 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: consumer-triggers-role-binding
+  namespace: bomc-tekton-pipelines
+subjects:
+- kind: ServiceAccount
+  name: consumer-triggers-sa
+  namespace: bomc-tekton-pipelines
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: consumer-triggers-role-minimal
+---

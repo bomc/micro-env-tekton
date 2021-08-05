@@ -1,0 +1,62 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: bomc-consumer-trigger-template
+  namespace: bomc-tekton-pipelines
+spec:
+  params:
+    - name: new_tag
+    - description: the new tag to set
+    - name: environment
+    - description: the environment to deploy
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        generateName: consumer-build-deploy-
+        namespace: bomc-tekton-pipelines
+      spec:
+        pipelineRef:
+          name: consumer-build-deploy
+        serviceAccountName: pipeline
+        params:
+        - name: url
+          value: 'git@github.com:bomc/micro-env-consumer-app.git'
+        - name: revision
+          value: 'main'
+        - name: sslVerify
+          value: 'false'
+        - name: IMAGE
+          value: 'registry.kube-system.svc.cluster.local/bomc/consumer'
+        - name: TLSVERIFY
+          value: 'false'
+
+        - name: curl-url-registry-catalog
+          value: 'http://registry.kube-system.svc.cluster.local:80/v2/_catalog'
+        - name: curl-url-registry-tag-list
+          value: 'http://registry.kube-system.svc.cluster.local:80/v2/bomc/consumer/tags/list'
+        - name: curl-options
+          value:
+            - '-v'
+
+        - name: DOCKER_FILE
+          value: 'Dockerfile'
+        - name: DOCKER_FILE_PATH
+          value: '/source'
+        - name: PIPELINE_DEBUG
+          value: '1'
+
+        - name: CONFIG_GIT_URL
+          value: 'git@github.com:bomc/micro-env-consumer-app.git'
+        - name: NEW_TAG
+          value: $(tt.params.new_tag)
+        - name: ARGO_APP_NAME
+          value: 'bomc-ms-argocd-consumer-apps'
+        - name: ENVIRONMENT
+          value: $(tt.params.environment)
+
+        workspaces:
+        - name: source
+          persistentVolumeClaim:
+            claimName: tekton-workspace-pvc
+

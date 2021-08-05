@@ -8,21 +8,6 @@ spec:
     name: consumer-build-deploy
   serviceAccountName: pipeline
   params:
-#  - name: buildRevision
-#    value: 'd9c7ccb0713da882d8373169e2a1d705f5959386'
-#  - name: appGitUrl
-#    value: 'git@github.com:example/app.git'
-#  - name: configGitUrl
-#    value: 'git@github.com:example/app-config.git'
-#  - name: appImage
-#    value: 'docker.example.com/app'
-#  workspaces:
-#  - name: app-source
-#    emptyDir: {}
-#  - name: config-source
-#    emptyDir: {}
-
-
   - name: url
     value: 'git@github.com:bomc/micro-env-consumer-app.git'
   - name: revision
@@ -52,7 +37,7 @@ spec:
   - name: CONFIG_GIT_URL
     value: 'git@github.com:bomc/micro-env-consumer-app.git'
   - name: NEW_TAG
-    value: 'v0.0.6'
+    value: 'v0.0.2'
   - name: ARGO_APP_NAME
     value: 'bomc-ms-argocd-consumer-apps'
   - name: ENVIRONMENT

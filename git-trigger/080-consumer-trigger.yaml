@@ -1,0 +1,16 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: Trigger
+metadata:
+  name: consumer-listener-prod
+  namespace: bomc-tekton-pipelines
+spec:
+  serviceAccountName: consumer-triggers-sa
+  interceptors:
+    - cel:
+        filter: >-
+          (header.match('X-Deploy-Event', 'start') && (body.environment in ['prod']))
+  bindings:
+    - ref: bomc-consumer-trigger-binding
+  template:
+    ref: bomc-consumer-trigger-template
+

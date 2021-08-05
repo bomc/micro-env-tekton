@@ -1,0 +1,13 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: bomc-consumer-trigger-binding
+  namespace: bomc-tekton-pipelines
+spec:
+  params:
+    - name: new_tag
+      value: $(body.new_tag)
+    - name: environment
+      value: $(body.environment)
+
+      

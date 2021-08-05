@@ -1,0 +1,27 @@
+# Start job manually
+#
+# 1. Get all running jobs and get the name
+# kubectl get cronjob -n bomc-tekton-pipelines
+# 2. Start the job
+# kubectl create job --from=cronjob/<name of cronjob> <name of job>
+# kubectl create job --from=cronjob/consumer-cron-trigger consumer-cron-job-trigger -n bomc-tekton-pipelines
+#
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: consumer-cron-trigger
+  namespace: bomc-tekton-pipelines
+spec:
+  # every minute: */1 * * * *
+  # once a day at midnight: 0 0 * * *
+  schedule: "0 0 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: consumer-cron-job-trigger
+            image: curlimages/curl
+            # curl -v -X POST http://localhost:8080 -H "Content-Type: application/json" -H "X-Deploy-Event: start" -d "{ \"environment\": \"prod\", \"new_tag\": \"v0.0.2\" }"
+            args: ["curl", "-v", "-X", "POST", "-H", "Content-Type: application/json", "-H", "X-Deploy-Event: start", "--data", "{ \"environment\": \"prod\", \"new_tag\": \"v0.0.2\" }", "el-consumer-event-listener-interceptor.bomc-tekton-pipelines.svc.cluster.local:8080"]
+          restartPolicy: Never

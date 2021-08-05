@@ -4,11 +4,12 @@ metadata:
   name: git-clone
   namespace: bomc-tekton-pipelines
 spec:
+  serviceAccountName: pipeline
   taskRef:
     name: git-clone
   params:
     - name: url
-      value: "https://github.com/bomc/micro-env-consumer-app.git"
+      value: "git@github.com:bomc/micro-env-consumer-app.git"
     - name: revision
       value: "main"
     - name: sslVerify
