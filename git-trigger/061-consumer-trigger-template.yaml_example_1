@@ -23,7 +23,7 @@ spec:
         - name: url
           value: 'git@github.com:bomc/micro-env-consumer-app.git'
         - name: revision
-          value: $(tt.params.new_tag)
+          value: 'main'
         - name: sslVerify
           value: 'false'
         - name: IMAGE

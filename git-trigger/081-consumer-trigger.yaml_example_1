@@ -8,7 +8,7 @@ spec:
   interceptors:
     - cel:
         filter: >-
-          body.ref == 'refs/heads/main'
+          (header.match('X-Deploy-Event', 'start') && (body.environment in ['prod']))
   bindings:
     - ref: bomc-consumer-trigger-binding
   template:

@@ -6,7 +6,8 @@ metadata:
 spec:
   params:
     - name: new_tag
-      value: $(body.head_commit.id)
+      value: $(body.new_tag)
     - name: environment
       value: $(body.environment)
----
+
+      

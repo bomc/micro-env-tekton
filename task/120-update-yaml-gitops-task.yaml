@@ -26,49 +26,14 @@ spec:
       value: argocd-server.argocd:80
 
   steps:
-  - name: git-clone
-    image: alpine/git:v2.26.2
-    env:
-    - name: WORKSPACE_OUTPUT_PATH
-      value: $(workspaces.source.path)
-    script: |
-      #!/usr/bin/env sh
-      set -ex
-      
-      CHECKOUT_DIR="${WORKSPACE_OUTPUT_PATH}"
-      cd ${CHECKOUT_DIR}
-      
-      # Delete any existing contents of the repo directory if it exists.
-      #
-      # We don't just "rm -rf ${CHECKOUT_DIR}" because ${CHECKOUT_DIR} might be "/"
-      # or the root of a mounted volume.
-      if [ -d "${CHECKOUT_DIR}" ] ; then
-        # Delete non-hidden files and directories
-        rm -rf "${CHECKOUT_DIR:?}"/*
-        # Delete files and directories starting with . but excluding ..
-        rm -rf "${CHECKOUT_DIR}"/.[!.]*
-        # Delete files and directories starting with .. plus any other character
-        rm -rf "${CHECKOUT_DIR}"/..?*
-      fi
-      
-      eval $(ssh-agent)
-      ssh-add ~/.ssh/id_*
-      git config --global core.sshCommand 'ssh -o StrictHostKeyChecking=accept-new'
-      
-      git init
-      git remote add origin $(params.CONFIG_GIT_URL)
-      git fetch --depth 1 origin main
-      git checkout main
   - name: update-yaml
     image: alpine/git:v2.26.2
-    env:
-    - name: WORKSPACE_OUTPUT_PATH
-      value: $(workspaces.source.path)
+    workingDir: "$(workspaces.source.path)/deployment/overlays/$(params.ENVIRONMENT)"
     script: |
       #!/usr/bin/env sh
       set -ex
       
-      cd ${WORKSPACE_OUTPUT_PATH}/deployment/overlays/$(params.ENVIRONMENT)
+      git checkout FETCH_HEAD
       
       echo "Updating $(params.ENVIRONMENT) image to $(params.IMAGE):$(params.NEW_TAG)"
       sed -i "s/newTag: "[a-zA-Z0-9.]\\+"/newTag: "$(params.NEW_TAG)"/g" kustomization.yaml
@@ -76,17 +41,10 @@ spec:
       cat kustomization.yaml
   - name: commit-push-changes-gitops
     image: alpine/git:v2.26.2
-    env:
-    - name: WORKSPACE_OUTPUT_PATH
-      value: $(workspaces.source.path)
+    workingDir: "$(workspaces.source.path)/deployment/overlays/$(params.ENVIRONMENT)"
     script: |
       #!/usr/bin/env sh
       set -ex
-      
-      cd ${WORKSPACE_OUTPUT_PATH}
-      
-      echo "$(pwd)"
-      echo "$(ls -alR)"
       
       git config --global user.email "michael_boerner@t-online.de"
       git config --global user.name "bomc"
@@ -99,15 +57,15 @@ spec:
       eval $(ssh-agent)
       ssh-add ~/.ssh/id_*
       
-      git push origin main
+      git push origin $(params.NEW_TAG)
   - name: wait-for-argocd-rollout
     image: argoproj/argocd:v2.0.0
     script: |
       #!/usr/bin/env sh
       set -e
-      
+
       printenv
-      
+
       argocd login ${ARGOCD_SERVER} --insecure --username admin --password bomc
       argocd app sync $(inputs.params.ARGO_APP_NAME) --insecure
       argocd app wait $(inputs.params.ARGO_APP_NAME) --sync --health --operation --insecure

@@ -1,0 +1,20 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: git-clone
+  namespace: bomc-tekton-pipelines
+spec:
+  serviceAccountName: pipeline
+  taskRef:
+    name: git-clone
+  params:
+    - name: url
+      value: "git@github.com:bomc/micro-env-consumer-app.git"
+    - name: revision
+      value: "main"
+    - name: sslVerify
+      value: "false"
+  workspaces:
+    - name: source
+      persistentVolumeClaim:
+        claimName: tekton-workspace-pvc
