@@ -85,19 +85,18 @@ spec:
       
       cd ${WORKSPACE_OUTPUT_PATH}
       
-      echo "$(pwd)"
-      echo "$(ls -alR)"
+      eval $(ssh-agent)
+      ssh-add ~/.ssh/id_*
+      
+      git config --global core.sshCommand 'ssh -o StrictHostKeyChecking=accept-new'
       
       git config --global user.email "michael_boerner@t-online.de"
       git config --global user.name "bomc"
       
-      git status
-      
       git add .
       git commit --allow-empty -m "[tekton] updating $(params.ENVIRONMENT) image to $(params.NEW_TAG)"
       
-      eval $(ssh-agent)
-      ssh-add ~/.ssh/id_*
+      git status
       
       git push origin main
   - name: wait-for-argocd-rollout

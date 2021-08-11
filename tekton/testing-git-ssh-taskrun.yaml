@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1beta1
 kind: TaskRun
 metadata:
   name: test-taskrun
-  namespace: tekton-pipelines
+  namespace: bomc-tekton-pipelines
 spec:
   serviceAccountName: pipeline
   taskSpec:
