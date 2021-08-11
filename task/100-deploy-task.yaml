@@ -90,7 +90,7 @@ spec:
       
       git config --global core.sshCommand 'ssh -o StrictHostKeyChecking=accept-new'
       
-      git config --global user.email "michael_boerner@t-online.de"
+      git config --global user.email "<your@email.address>"
       git config --global user.name "bomc"
       
       git add .

@@ -46,7 +46,7 @@ spec:
       #!/usr/bin/env sh
       set -ex
       
-      git config --global user.email "michael_boerner@t-online.de"
+      git config --global user.email "<your@email.address>"
       git config --global user.name "bomc"
       
       git status

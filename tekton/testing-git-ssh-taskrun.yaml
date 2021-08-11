@@ -32,7 +32,7 @@ spec:
         
         ls -rla
         
-        git config --global user.email "michael_boerner@t-online.de"
+        git config --global user.email "<your@email.address>"
         git config --global user.name "bomc"
         
         # Create a new file and push it to the repository.
